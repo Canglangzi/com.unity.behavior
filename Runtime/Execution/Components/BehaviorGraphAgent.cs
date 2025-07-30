@@ -711,7 +711,21 @@ namespace Unity.Behavior
             m_Graph.Restart();
             m_IsStarted = true;
         }
+	public enum UpdateFrequency
+{
+    High,      // 高频更新（每帧）
+    Medium,    // 中频更新（每2帧）
+    Low        // 低频更新（每4帧）
+}
+[SerializeField] 
+[Tooltip("Controls how frequently the behavior tree updates")]
+private UpdateFrequency m_UpdateFrequency = UpdateFrequency.High;
 
+public UpdateFrequency UpdateFreq
+{
+    get => m_UpdateFrequency;
+    set => m_UpdateFrequency = value;
+}
         /// <summary>
         /// Ticks the agent's behavior graph and initializes and starts the graph if necessary.
         /// </summary>
@@ -734,7 +748,27 @@ namespace Unity.Behavior
                 m_Graph.Start();
                 m_IsStarted = true;
             }
+       switch (m_UpdateFrequency)
+    {
+        case UpdateFrequency.High:
+            // 高频：每帧都更新
             m_Graph.Tick();
+            break;
+            
+        case UpdateFrequency.Medium:
+            // 中频：每2帧更新一次
+            if (Time.frameCount % 2 == 0) {
+                m_Graph.Tick();
+            }
+            break;
+            
+        case UpdateFrequency.Low:
+            // 低频：每4帧更新一次
+            if (Time.frameCount % 4 == 0) {
+                m_Graph.Tick();
+            }
+            break;
+    }
         }
 
 #if NETCODE_FOR_GAMEOBJECTS
